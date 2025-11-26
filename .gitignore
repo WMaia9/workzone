@@ -5,34 +5,28 @@ __pycache__/
 *.py[cod]
 *.pyo
 *.pyd
+*.pyc
 
+# ---------------------------------
 # Virtual environments
+# ---------------------------------
 .venv/
 venv/
 env/
+workzone/
 
+# ---------------------------------
 # Jupyter
+# ---------------------------------
 .ipynb_checkpoints/
 
 # ---------------------------------
 # Data
 # ---------------------------------
-# Ignore heavy image and video data
-data/
-data/videos/
-data/raw/
-workzone_yolo/
-data/
-workzone/
-__pycache__/
-*.pyc
+# Ignore everything inside data
+data/*
 
-# Keep annotations and lightweight metadata
-!data/annotations/
-!data/annotations/*.json
-!data/README.md
-!data/demo/
-!data/demo/*
+# Keep only demo videos
 
 # ---------------------------------
 # Training outputs and artifacts
@@ -40,14 +34,7 @@ __pycache__/
 runs/
 runs_workzone/
 models/
-# Large model files
-*.onnx
-*.engine
-
-# Large media outputs
-*.mp4
-*.avi
-*.mov
+workzone_yolo/
 
 # ---------------------------------
 # Logs and cache
