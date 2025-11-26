@@ -31,6 +31,8 @@ __pycache__/
 !data/annotations/
 !data/annotations/*.json
 !data/README.md
+!data/demo/
+!data/demo/*
 
 # ---------------------------------
 # Training outputs and artifacts

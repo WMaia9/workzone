@@ -14,6 +14,15 @@ import torch
 # =========================
 
 DEFAULT_WEIGHTS_PATH = "best.pt"
+DEMO_VIDEOS_DIR = Path("data/demo")
+
+
+def list_demo_videos():
+    """List available demo videos in data/demo."""
+    if not DEMO_VIDEOS_DIR.exists():
+        return []
+    return sorted(DEMO_VIDEOS_DIR.glob("*.mp4"))
+
 
 WORKZONE_CLASSES = {
     0: "Cone",
@@ -43,7 +52,7 @@ def load_model_cached(weights_bytes: bytes, suffix: str, device: str):
     with open(tmp_path, "wb") as f:
         f.write(weights_bytes)
     model = YOLO(str(tmp_path))
-    # move to device once
+    # Move to device once
     try:
         model.to(device)
     except Exception:
@@ -130,6 +139,7 @@ def draw_workzone_banner(frame: np.ndarray, score: float) -> np.ndarray:
     )
 
     return frame
+
 
 def process_video_batch(
     input_path: Path,
@@ -336,6 +346,7 @@ def run_live_preview(
         rows.append(f"{name}: {class_counts.get(cid, 0)}")
     st.text("\n".join(rows))
 
+
 def resolve_device(device_choice: str) -> str:
     """
     Resolve the device string based on user choice.
@@ -367,8 +378,9 @@ def main():
     st.title("Work Zone Detection - YOLO Video Demo")
 
     st.markdown(
-        "Upload a video, choose YOLO weights, device, thresholds and run detection. "
-        "You can use batch mode to save an annotated video or live preview to simulate real time."
+        "Upload a video, or choose a demo video, select YOLO weights, device, thresholds "
+        "and run detection. You can use batch mode to save an annotated video or live "
+        "preview to simulate real time."
     )
 
     # Sidebar - model and parameters
@@ -419,21 +431,50 @@ def main():
     st.sidebar.markdown("---")
     st.sidebar.info("Choose parameters before running detection.")
 
-    # Main - video upload
-    st.subheader("Upload video")
+    # Main - video source selection
+    st.subheader("Video source")
 
-    video_file = st.file_uploader(
-        "Video file",
-        type=["mp4", "mov", "avi", "mkv"],
-        help="Upload a sample work zone video.",
+    video_source = st.radio(
+        "Choose video input",
+        ["Upload video", "Use demo video"],
+        index=0,
     )
+
+    demo_videos = list_demo_videos()
+    selected_demo = None
+    video_file = None
+
+    if video_source == "Upload video":
+        video_file = st.file_uploader(
+            "Video file",
+            type=["mp4", "mov", "avi", "mkv"],
+            help="Upload a sample work zone video.",
+        )
+    else:
+        if not demo_videos:
+            st.warning("No demo videos found in data/demo.")
+        else:
+            demo_names = [p.name for p in demo_videos]
+            selected_name = st.selectbox("Select a demo video", demo_names)
+            if selected_name:
+                selected_demo = DEMO_VIDEOS_DIR / selected_name
 
     run_clicked = st.button("Run work zone detection", type="primary")
 
     if run_clicked:
-        if video_file is None:
-            st.warning("Please upload a video first.")
-            return
+        # Resolve video path based on source
+        if video_source == "Upload video":
+            if video_file is None:
+                st.warning("Please upload a video first.")
+                return
+            tmp_video_path = Path(tempfile.gettempdir()) / video_file.name
+            with open(tmp_video_path, "wb") as f:
+                f.write(video_file.getbuffer())
+        else:
+            if selected_demo is None:
+                st.warning("Please select a demo video.")
+                return
+            tmp_video_path = selected_demo
 
         # Load model
         with st.spinner("Loading YOLO model..."):
@@ -457,11 +498,6 @@ def main():
                 return
 
         st.success(f"Model loaded on device: {device}")
-
-        # Save uploaded video to temp
-        tmp_video_path = Path(tempfile.gettempdir()) / video_file.name
-        with open(tmp_video_path, "wb") as f:
-            f.write(video_file.getbuffer())
 
         frames_limit = None if max_frames == 0 else int(max_frames)
 
