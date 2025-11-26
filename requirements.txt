@@ -1,6 +1,7 @@
 ultralytics
 streamlit
-opencv-python
+opencv-python-headless
+
 
 numpy
 pandas
@@ -10,8 +11,3 @@ tqdm
 Pillow
 
 transformers
-
-jupyter
-ipykernel
-
-opencv-python-headless
