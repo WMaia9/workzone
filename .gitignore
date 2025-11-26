@@ -27,6 +27,8 @@ workzone/
 data/*
 
 # Keep only demo videos
+!data/demo/
+!data/demo/*.mp4
 
 # ---------------------------------
 # Training outputs and artifacts
