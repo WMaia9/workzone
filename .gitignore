@@ -18,7 +18,7 @@ env/
 # Data
 # ---------------------------------
 # Ignore heavy image and video data
-data/images/
+data/
 data/videos/
 data/raw/
 workzone_yolo/
