@@ -13,3 +13,5 @@ transformers
 
 jupyter
 ipykernel
+
+opencv-python-headless

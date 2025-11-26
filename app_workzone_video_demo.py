@@ -12,7 +12,7 @@ from typing import Optional
 # CONFIG
 # =========================
 
-DEFAULT_WEIGHTS_PATH = "runs_workzone/yolov8s_workzone/weights/best.pt"
+DEFAULT_WEIGHTS_PATH = "best.pt"
 
 WORKZONE_CLASSES = {
     0: "Cone",
@@ -357,7 +357,7 @@ def main():
     device_choice = st.sidebar.radio(
         "Device",
         ["Auto", "GPU (cuda)", "CPU"],
-        index=1,
+        index=0,
         help="GPU requires a working CUDA PyTorch install.",
     )
     if device_choice == "GPU (cuda)":
