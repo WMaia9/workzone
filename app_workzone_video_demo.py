@@ -7,6 +7,7 @@ import numpy as np
 import streamlit as st
 from ultralytics import YOLO
 from typing import Optional
+import torch
 
 # =========================
 # CONFIG
@@ -129,7 +130,6 @@ def draw_workzone_banner(frame: np.ndarray, score: float) -> np.ndarray:
     )
 
     return frame
-
 
 def process_video_batch(
     input_path: Path,
@@ -336,6 +336,27 @@ def run_live_preview(
         rows.append(f"{name}: {class_counts.get(cid, 0)}")
     st.text("\n".join(rows))
 
+def resolve_device(device_choice: str) -> str:
+    """
+    Resolve the device string based on user choice.
+    - 'GPU (cuda)': try cuda
+    - 'CPU': cpu
+    - 'Auto': cuda if available, else cpu
+    """
+    if device_choice == "GPU (cuda)":
+        return "cuda"
+    if device_choice == "CPU":
+        return "cpu"
+
+    # Auto
+    try:
+        if torch.cuda.is_available():
+            return "cuda"
+        else:
+            return "cpu"
+    except Exception:
+        return "cpu"
+
 
 # =========================
 # STREAMLIT UI
@@ -360,12 +381,8 @@ def main():
         index=0,
         help="GPU requires a working CUDA PyTorch install.",
     )
-    if device_choice == "GPU (cuda)":
-        device = "cuda"
-    elif device_choice == "CPU":
-        device = "cpu"
-    else:
-        device = "cuda"  # try GPU by default
+    device = resolve_device(device_choice)
+    st.sidebar.text(f"Using device: {device}")
 
     use_uploaded_weights = st.sidebar.checkbox(
         "Upload YOLO weights (.pt)", value=False
