@@ -22,6 +22,10 @@ data/
 data/videos/
 data/raw/
 workzone_yolo/
+data/
+workzone/
+__pycache__/
+*.pyc
 
 # Keep annotations and lightweight metadata
 !data/annotations/
