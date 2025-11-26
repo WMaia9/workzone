@@ -39,7 +39,6 @@ runs/
 runs_workzone/
 models/
 # Large model files
-*.pt
 *.onnx
 *.engine
 
